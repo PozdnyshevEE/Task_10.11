@@ -29,10 +29,58 @@ let fruits = JSON.parse(fruitsJSON);
 const display = () => {
   // TODO: очищаем fruitsList от вложенных элементов,
   // чтобы заполнить актуальными данными из fruits
+  
+  console.log(fruitsList);
+  fruitsList.innerHTML = '';
+  console.log(fruitsList);
 
   for (let i = 0; i < fruits.length; i++) {
     // TODO: формируем новый элемент <li> при помощи document.createElement,
     // и добавляем в конец списка fruitsList при помощи document.appendChild
+    const customLi = document.createElement('li');
+    customLi.className = "fruit__item fruit_violet";
+    //customLi.className = "fruit_violet";
+    customLi.innerHTML = `div class=\"fruit__info\"><div>${i}</div><div>kind: ${fruits.kind}</div><div>color: фиолетовый</div><div>weight (кг): 13</div></div>`;
+    /* <li class="fruit__item fruit_violet">
+            <div class="fruit__info">
+              <div>index: 0</div>
+              <div>kind: Мангустин</div>
+              <div>color: фиолетовый</div>
+              <div>weight (кг): 13</div>
+            </div>
+          </li>
+          <li class="fruit__item fruit_green">
+            <div class="fruit__info">
+              <div>index: 1</div>
+              <div>kind: Дуриан</div>
+              <div>color: зеленый</div>
+              <div>weight (кг): 35</div>
+            </div>
+          </li>
+          <li class="fruit__item fruit_carmazin">
+            <div class="fruit__info">
+              <div>index: 2</div>
+              <div>kind: Личи</div>
+              <div>color: розово-красный</div>
+              <div>weight (кг): 17</div>
+            </div>
+          </li>
+          <li class="fruit__item fruit_yellow">
+            <div class="fruit__info">
+              <div>index: 3</div>
+              <div>kind: Карамбола</div>
+              <div>color: Желтый</div>
+              <div>weight (кг): 28</div>
+            </div>
+          </li>
+          <li class="fruit__item fruit_lightbrown">
+            <div class="fruit__info">
+              <div>index: 4</div>
+              <div>kind: Тамаринд</div>
+              <div>color: светло-коричневый</div>
+              <div>weight (кг): 22</div>
+            </div>
+          </li> */
   }
 };
 
