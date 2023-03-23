@@ -23,16 +23,35 @@ let fruitsJSON = `[
 // преобразование JSON в объект JavaScript
 let fruits = JSON.parse(fruitsJSON);
 
+
 /*** ОТОБРАЖЕНИЕ ***/
 
 // отрисовка карточек
 const display = () => {
   // TODO: очищаем fruitsList от вложенных элементов,
   // чтобы заполнить актуальными данными из fruits
+ // console.log(fruits);
+  while(fruitsList.firstChild) {
+    fruitsList.removeChild(fruitsList.firstChild);
+  }
+
 
   for (let i = 0; i < fruits.length; i++) {
     // TODO: формируем новый элемент <li> при помощи document.createElement,
     // и добавляем в конец списка fruitsList при помощи document.appendChild
+
+    // Определяем какой класс, отвечающий за цвет рамки, будем добавлять к li
+    let colorClass;
+    if(fruits[i].color === "фиолетовый") {colorClass = "fruit_violet"}
+    else if(fruits[i].color === "зеленый") {colorClass = "fruit_green"}
+    else if(fruits[i].color === "розово-красный") {colorClass = "fruit_carmazin"}
+    else if(fruits[i].color === "желтый") {colorClass = "fruit_yellow"}
+    else if(fruits[i].color === "светло-коричневый") {colorClass = "fruit_lightbrown"}
+
+    const customLi = document.createElement("li");
+    customLi.className = (`fruit__item ${colorClass}`);
+    customLi.innerHTML = `<div class="fruit__info"><div>index: ${i}</div><div>kind: ${fruits[i].kind}</div><div>color: ${fruits[i].color}</div><div>weight (кг): ${fruits[i].weight}</div></div>`;
+    fruitsList.appendChild(customLi);
   }
 };
 
@@ -58,9 +77,14 @@ const shuffleFruits = () => {
     // вырезаем его из fruits и вставляем в result.
     // ex.: [1, 2, 3], [] => [1, 3], [2] => [3], [2, 1] => [], [2, 1, 3]
     // (массив fruits будет уменьшатся, а result заполняться)
+    let lengthArr = fruits.length;
+    let randomInt = getRandomInt(0, lengthArr - 1);
+    let temp = fruits.splice(randomInt, 1);
+    result.push.apply(result, temp); 
   }
 
-  fruits = result;
+  if(fruits === result) alert("Порядок не изменился")
+  else fruits = result;
 };
 
 shuffleButton.addEventListener('click', () => {
