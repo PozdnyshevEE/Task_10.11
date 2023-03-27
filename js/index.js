@@ -30,57 +30,26 @@ const display = () => {
   // TODO: очищаем fruitsList от вложенных элементов,
   // чтобы заполнить актуальными данными из fruits
   
-  console.log(fruitsList);
-  fruitsList.innerHTML = '';
-  console.log(fruitsList);
+  while(fruitsList.firstChild) {
+    fruitsList.removeChild(fruitsList.firstChild);
+  }
 
   for (let i = 0; i < fruits.length; i++) {
     // TODO: формируем новый элемент <li> при помощи document.createElement,
     // и добавляем в конец списка fruitsList при помощи document.appendChild
-    const customLi = document.createElement('li');
-    customLi.className = "fruit__item fruit_violet";
-    //customLi.className = "fruit_violet";
-    customLi.innerHTML = `div class=\"fruit__info\"><div>${i}</div><div>kind: ${fruits.kind}</div><div>color: фиолетовый</div><div>weight (кг): 13</div></div>`;
-    /* <li class="fruit__item fruit_violet">
-            <div class="fruit__info">
-              <div>index: 0</div>
-              <div>kind: Мангустин</div>
-              <div>color: фиолетовый</div>
-              <div>weight (кг): 13</div>
-            </div>
-          </li>
-          <li class="fruit__item fruit_green">
-            <div class="fruit__info">
-              <div>index: 1</div>
-              <div>kind: Дуриан</div>
-              <div>color: зеленый</div>
-              <div>weight (кг): 35</div>
-            </div>
-          </li>
-          <li class="fruit__item fruit_carmazin">
-            <div class="fruit__info">
-              <div>index: 2</div>
-              <div>kind: Личи</div>
-              <div>color: розово-красный</div>
-              <div>weight (кг): 17</div>
-            </div>
-          </li>
-          <li class="fruit__item fruit_yellow">
-            <div class="fruit__info">
-              <div>index: 3</div>
-              <div>kind: Карамбола</div>
-              <div>color: Желтый</div>
-              <div>weight (кг): 28</div>
-            </div>
-          </li>
-          <li class="fruit__item fruit_lightbrown">
-            <div class="fruit__info">
-              <div>index: 4</div>
-              <div>kind: Тамаринд</div>
-              <div>color: светло-коричневый</div>
-              <div>weight (кг): 22</div>
-            </div>
-          </li> */
+
+    // Определяем какой класс, отвечающий за цвет рамки, будем добавлять к li
+    let colorClass;
+    if(fruits[i].color === "фиолетовый") {colorClass = "fruit_violet"}
+    else if(fruits[i].color === "зеленый") {colorClass = "fruit_green"}
+    else if(fruits[i].color === "розово-красный") {colorClass = "fruit_carmazin"}
+    else if(fruits[i].color === "желтый") {colorClass = "fruit_yellow"}
+    else if(fruits[i].color === "светло-коричневый") {colorClass = "fruit_lightbrown"}
+
+    const customLi = document.createElement("li");
+    customLi.className = (`fruit__item ${colorClass}`);
+    customLi.innerHTML = `<div class="fruit__info"><div>index: ${i}</div><div>kind: ${fruits[i].kind}</div><div>color: ${fruits[i].color}</div><div>weight (кг): ${fruits[i].weight}</div></div>`;
+    fruitsList.appendChild(customLi);
   }
 };
 
@@ -106,9 +75,15 @@ const shuffleFruits = () => {
     // вырезаем его из fruits и вставляем в result.
     // ex.: [1, 2, 3], [] => [1, 3], [2] => [3], [2, 1] => [], [2, 1, 3]
     // (массив fruits будет уменьшатся, а result заполняться)
+
+    let lengthArr = fruits.length;
+    let randomInt = getRandomInt(0, lengthArr - 1);
+    let temp = fruits.splice(randomInt, 1);
+    result.push.apply(result, temp); 
   }
 
-  fruits = result;
+  if(fruits === result) alert("Порядок не изменился")
+  else fruits = result;
 };
 
 shuffleButton.addEventListener('click', () => {
@@ -120,9 +95,15 @@ shuffleButton.addEventListener('click', () => {
 
 // фильтрация массива
 const filterFruits = () => {
-  fruits.filter((item) => {
-    // TODO: допишите функцию
+  let min = parseInt(document.querySelector('.minweight__input').value);
+  let max = parseInt(document.querySelector('.maxweight__input').value);
+  
+  let result = fruits.filter((item) => {
+     // TODO: допишите функцию
+  
+    return ((min <= item.weight) && (max >= item.weight));
   });
+  fruits = result;
 };
 
 filterButton.addEventListener('click', () => {
@@ -137,15 +118,83 @@ let sortTime = '-'; // инициализация состояния време�
 
 const comparationColor = (a, b) => {
   // TODO: допишите функцию сравнения двух элементов по цвету
+  const priority = ["розово-красный", "желтый", "зеленый", "фиолетовый", "светло-коричневый"];
+
+  const priority1 = priority.indexOf(a.color);
+  const priority2 = priority.indexOf(b.color);
+  
+  return priority1 > priority2;
 };
 
 const sortAPI = {
   bubbleSort(arr, comparation) {
     // TODO: допишите функцию сортировки пузырьком
+    const n = arr.length;
+
+    // внешняя итерация по элементам
+    for (let i = 0; i < n - 1; i++) {
+      // внутренняя итерация для перестановки элемента в конец массива
+      for (let j = 0; j < n - 1 - i; j++) {
+         // сравниваем элементы
+        if (comparation(arr[j], arr[j + 1])) {
+           // сравниваем элементы
+          [arr[j + 1], arr[j]] = [arr[j], arr[j + 1]];
+        }
+      }
+    }
   },
 
   quickSort(arr, comparation) {
     // TODO: допишите функцию быстрой сортировки
+    function partition(arr, start, end) {
+      // Берем последний элемент в качестве стержня
+      const pivot = arr[end];
+      let index = start;
+      for (let i = start; i < end; i++) {
+        if (comparation(pivot, arr[i])) {
+          // Замена элементов
+          [arr[i], arr[index]] = [arr[index], arr[i]];
+          // Переход к следующему элементу
+          index++;
+        }
+      }  
+      //  Помещаем значение pivot в середину
+      [arr[index], arr[end]] = [arr[end], arr[index]];
+      return index;
+    }
+
+    // алгоритм быстрой сортировки
+    // Создаем массив, который мы будем использовать в качестве стека, используя функции push() и pop()
+    let stack = [];
+
+    // Добавление всего исходного массива в качестве "несортированного подмассива"
+    stack.push(0);
+    stack.push(arr.length - 1);
+
+    // Явной функции peek() не существует
+    // Цикл повторяется до тех пор, пока у нас есть несортированные подмассивы
+    while(stack[stack.length - 1] >= 0) {
+
+      // Извлечение верхнего несортированного подмассива
+      let end = stack.pop();
+      let start = stack.pop();
+
+      let pivotIndex = partition(arr, start, end);
+
+      //Если есть несортированные элементы "слева" от pivot,
+      // мы добавляем этот подмассив в стек, чтобы мы могли отсортировать его позже
+      if (pivotIndex - 1 > start){
+        stack.push(start);
+          stack.push(pivotIndex - 1);
+      }
+
+      //Если есть несортированные элементы "справа" от pivot,
+      // мы добавляем этот подмассив в стек, чтобы мы могли отсортировать его позже
+      if (pivotIndex + 1 < end){
+        stack.push(pivotIndex + 1);
+          stack.push(end);
+      }
+    }
   },
 
   // выполняет сортировку и производит замер времени
@@ -163,6 +212,8 @@ sortTimeLabel.textContent = sortTime;
 
 sortChangeButton.addEventListener('click', () => {
   // TODO: переключать значение sortKind между 'bubbleSort' / 'quickSort'
+  sortKind = sortKind === 'bubbleSort' ? 'quickSort' : 'bubbleSort';
+  sortKindLabel.textContent = sortKind;
 });
 
 sortActionButton.addEventListener('click', () => {
@@ -171,6 +222,7 @@ sortActionButton.addEventListener('click', () => {
   sortAPI.startSort(sort, fruits, comparationColor);
   display();
   // TODO: вывести в sortTimeLabel значение sortTime
+  sortTimeLabel.textContent = sortTime;
 });
 
 /*** ДОБАВИТЬ ФРУКТ ***/
@@ -178,5 +230,8 @@ sortActionButton.addEventListener('click', () => {
 addActionButton.addEventListener('click', () => {
   // TODO: создание и добавление нового фрукта в массив fruits
   // необходимые значения берем из kindInput, colorInput, weightInput
+  fruits.kind = kindInput;
+  fruits.color = colorInput;
+  fruits.weightInput = parseInt(weightInput.value);
   display();
 });
