@@ -230,8 +230,22 @@ sortActionButton.addEventListener('click', () => {
 addActionButton.addEventListener('click', () => {
   // TODO: создание и добавление нового фрукта в массив fruits
   // необходимые значения берем из kindInput, colorInput, weightInput
-  fruits.kind = kindInput;
-  fruits.color = colorInput;
-  fruits.weightInput = parseInt(weightInput.value);
+  let temp;
+  let fruit = {
+  "kind": kindInput.value,
+  "color": colorInput.value,
+  "weight": parseInt(weightInput.value),
+  }
+  if (fruit.kind === "") {
+    temp = "kind";
+    alert(`Вы не заполнили поле ${temp}`)}
+  else if (fruit.color === "") {
+    temp = "color";
+    alert(`Вы не заполнили поле ${temp}`)}
+  else if (Number.isNaN(fruit.weight)) {
+    temp = "weight";
+    alert(`Вы не заполнили поле ${temp}`)}
+  else 
+  fruits.push(fruit);
   display();
 });
