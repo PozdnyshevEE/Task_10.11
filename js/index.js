@@ -1,6 +1,8 @@
 // элементы в DOM можно получить при помощи функции querySelector
 const fruitsList = document.querySelector('.fruits__list'); // список карточек
 const shuffleButton = document.querySelector('.shuffle__btn'); // кнопка перемешивания
+const minWeight = document.querySelector('.minweight__input'); //нижняя граница weight для фильтрации
+const maxWeight = document.querySelector('.maxweight__input'); //верхняя граница weight для фильтрации
 const filterButton = document.querySelector('.filter__btn'); // кнопка фильтрации
 const sortKindLabel = document.querySelector('.sort__kind'); // поле с названием сортировки
 const sortTimeLabel = document.querySelector('.sort__time'); // поле с временем сортировки
@@ -30,7 +32,7 @@ let fruits = JSON.parse(fruitsJSON);
 const display = () => {
   // TODO: очищаем fruitsList от вложенных элементов,
   // чтобы заполнить актуальными данными из fruits
- // console.log(fruits);
+  console.log("Дисплей", fruits);
   while(fruitsList.firstChild) {
     fruitsList.removeChild(fruitsList.firstChild);
   }
@@ -96,9 +98,15 @@ shuffleButton.addEventListener('click', () => {
 
 // фильтрация массива
 const filterFruits = () => {
-  fruits.filter((item) => {
-    // TODO: допишите функцию
+  let min = parseInt(minWeight.value);
+  let max = parseInt(maxWeight.value);
+  
+  let result = fruits.filter((item) => {
+     // TODO: допишите функцию
+  
+    return ((min <= item.weight) && (max >= item.weight));
   });
+  fruits = result;
 };
 
 filterButton.addEventListener('click', () => {
@@ -113,15 +121,84 @@ let sortTime = '-'; // инициализация состояния време�
 
 const comparationColor = (a, b) => {
   // TODO: допишите функцию сравнения двух элементов по цвету
+  const priority = ["розово-красный", "желтый", "зеленый", "фиолетовый", "светло-коричневый"];
+
+  const priority1 = priority.indexOf(a.color);
+  const priority2 = priority.indexOf(b.color);
+  
+  return priority1 > priority2;
 };
 
 const sortAPI = {
   bubbleSort(arr, comparation) {
     // TODO: допишите функцию сортировки пузырьком
+    const n = arr.length;
+
+    // внешняя итерация по элементам
+    for (let i = 0; i < n - 1; i++) {
+      // внутренняя итерация для перестановки элемента в конец массива
+      for (let j = 0; j < n - 1 - i; j++) {
+         // сравниваем элементы
+        if (comparation(arr[j], arr[j + 1])) {
+           // сравниваем элементы
+          [arr[j + 1], arr[j]] = [arr[j], arr[j + 1]];
+        }
+      }
+    }
   },
 
   quickSort(arr, comparation) {
     // TODO: допишите функцию быстрой сортировки
+    // функция разделитель
+    function partition(arr, start, end) {
+      // Берем последний элемент в качестве стержня
+      const pivot = arr[end];
+      let index = start;
+      for (let i = start; i < end; i++) {
+        if (comparation(pivot, arr[i])) {
+          // Замена элементов
+          [arr[i], arr[indwx]] = [arr[index], arr[i]];
+          // Переход к следующему элементу
+          index++
+        }
+      }  
+      //  Помещаем значение pivot в середину
+      [arr[index], arr[end]] = [arr[end], arr[index]];
+      return index;
+    }
+
+    // алгоритм быстрой сортировки
+    // Создаем массив, который мы будем использовать в качестве стека, используя функции push() и pop()
+    let stack = [];
+
+    // Добавление всего исходного массива в качестве "несортированного подмассива"
+    stack.push(0);
+    stack.push(arr.length - 1);
+
+    // Явной функции peek() не существует
+    // Цикл повторяется до тех пор, пока у нас есть несортированные подмассивы
+    while(stack[stack.length - 1] >= 0) {
+
+      // Извлечение верхнего несортированного подмассива
+      let end = stack.pop();
+      let start = stack.pop();
+
+      let pivotIndex = partition(arr, start, end);
+
+      //Если есть несортированные элементы "слева" от pivot,
+      // мы добавляем этот подмассив в стек, чтобы мы могли отсортировать его позже
+      if (pivotIndex - 1 > start){
+        stack.push(start);
+          stack.push(pivotIndex - 1);
+      }
+
+      //Если есть несортированные элементы "справа" от pivot,
+      // мы добавляем этот подмассив в стек, чтобы мы могли отсортировать его позже
+      if (pivotIndex + 1 < end){
+        stack.push(pivotIndex + 1);
+          stack.push(end);
+      }
+    }
   },
 
   // выполняет сортировку и производит замер времени
@@ -139,14 +216,17 @@ sortTimeLabel.textContent = sortTime;
 
 sortChangeButton.addEventListener('click', () => {
   // TODO: переключать значение sortKind между 'bubbleSort' / 'quickSort'
+  sortKind = sortKind === 'bubbleSort' ? 'quickSort' : 'bubbleSort';
+  sortKindLabel.textContent = sortKind;
 });
 
 sortActionButton.addEventListener('click', () => {
-  // TODO: вывести в sortTimeLabel значение 'sorting...'
+  // TODO: вывести в sortKindLabel значение 'sorting...'
   const sort = sortAPI[sortKind];
   sortAPI.startSort(sort, fruits, comparationColor);
   display();
   // TODO: вывести в sortTimeLabel значение sortTime
+  sortTimeLabel.textContent = sortTime;
 });
 
 /*** ДОБАВИТЬ ФРУКТ ***/
